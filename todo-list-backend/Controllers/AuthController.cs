@@ -31,8 +31,8 @@ namespace todo_list_backend.Controllers
             {
                 valid = result.Accepted,
                 token = result.Token,
-                email = result.User.Email,
-                displayName = result.User.DisplayName
+                email = result.User.Get(user => user.Email, () => ""),
+                displayName = result.User.Get(user => user.DisplayName, () => "")
             });
         }
     }

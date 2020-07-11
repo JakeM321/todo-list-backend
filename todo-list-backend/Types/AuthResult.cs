@@ -10,6 +10,6 @@ namespace todo_list_backend.Types
     {
         public bool Accepted { get; set; }
         public string Token { get; set; }
-        public User User { get; set; }
+        public Option<User> User { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using todo_list_backend.Models;
 using todo_list_backend.Repositories;
 using todo_list_backend.Types;
 
@@ -35,13 +36,13 @@ namespace todo_list_backend.Services
                     {
                         Accepted = passwordMatches,
                         Token = passwordMatches ? BuildToken(secret, user.Id) : "",
-                        User = user
+                        User = new Option<User>(user)
                     };
                 },
                 () => new AuthResult {
                     Accepted = false,
                     Token = "",
-                    User = null
+                    User = new Option<User>()
                 }
             );
         }
@@ -60,7 +61,7 @@ namespace todo_list_backend.Services
                     user => new AuthResult
                     {
                         Accepted = true,
-                        User = user,
+                        User = new Option<User>(user),
                         Token = fiveMinutesFromNow > decoded.exp ? BuildToken(secret, user.Id) : token
                     },
                     () => new AuthResult { Accepted = false, Token = "", User = null }
@@ -71,7 +72,7 @@ namespace todo_list_backend.Services
                 if (ex is TokenExpiredException || ex is SignatureVerificationException)
                 {
                     Console.WriteLine("Failed auth");
-                    return new AuthResult { Accepted = false, Token = "", User = null };
+                    return new AuthResult { Accepted = false, Token = "", User = new Option<User>() };
                 }
                 else
                 {
