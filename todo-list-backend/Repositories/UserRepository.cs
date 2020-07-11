@@ -24,5 +24,10 @@ namespace todo_list_backend.Repositories
             var search = _db.Users.Where(predicate);
             return search.Any() ? new Option<User>(search.First()) : new Option<User>();
         }
+
+        public Option<User> FindById(int id)
+        {
+            return Find(user => user.Id == id);
+        }
     }
 }

@@ -26,7 +26,14 @@ namespace todo_list_backend.Controllers
         public IActionResult EmailLogin([FromBody] EmailLoginPayload payload)
         {
             var result = _authenticationService.AuthenticateEmailAndPassword(payload.email, payload.password);
-            return new JsonResult(new { valid = result });
+
+            return new JsonResult(new
+            {
+                valid = result.Accepted,
+                token = result.Token,
+                email = result.User.Email,
+                displayName = result.User.DisplayName
+            });
         }
     }
 }
