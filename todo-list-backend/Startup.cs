@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using todo_list_backend.Repositories;
 
 namespace todo_list_backend
 {
@@ -26,6 +28,8 @@ namespace todo_list_backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddDbContext<AppDbContext>(options => options.UseSqlite(SqliteSetup.ConnectionString));
+            services.AddTransient<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +38,7 @@ namespace todo_list_backend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                SqliteSetup.RunSetup();
             }
 
             app.UseHttpsRedirection();

@@ -1,0 +1,7 @@
+CREATE TABLE Users (
+	Id INTEGER PRIMARY KEY AUTOINCREMENT,
+	Email TEXT,
+	DisplayName TEXT,
+	PasswordHash TEXT,
+	Salt TEXT
+);
