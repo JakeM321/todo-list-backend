@@ -28,7 +28,7 @@ namespace todo_list_backend.Services
             var search = _userRepository.Find(user => user.Email == email && !user.SsoUser);
             return search.Get(
                 user => {
-                    string secret = _configuration.GetValue("Secret", "");
+                    string secret = _configuration.GetValue("TodoListApp:JWTSecret", "");
                     var passwordMatches = Utils.Authentication.PasswordEncryption.VerifyPassword(user.PasswordHash, user.Salt, password);
 
                     return new AuthResult
@@ -48,7 +48,7 @@ namespace todo_list_backend.Services
 
         public AuthResult AuthenticateToken(string token)
         {
-            string secret = _configuration.GetValue("Secret", "");
+            string secret = _configuration.GetValue("TodoListApp:JWTSecret", "");
 
             try
             {
