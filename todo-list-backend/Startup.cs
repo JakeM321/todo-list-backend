@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using todo_list_backend.Repositories;
+using todo_list_backend.Services;
 
 namespace todo_list_backend
 {
@@ -30,6 +31,7 @@ namespace todo_list_backend
             services.AddControllers();
             services.AddDbContext<AppDbContext>(options => options.UseSqlite(SqliteSetup.ConnectionString));
             services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

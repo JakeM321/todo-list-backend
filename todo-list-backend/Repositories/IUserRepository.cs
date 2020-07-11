@@ -7,7 +7,7 @@ using todo_list_backend.Types;
 
 namespace todo_list_backend.Repositories
 {
-    interface IUserRepository
+    public interface IUserRepository
     {
         Option<User> Find(Func<User, bool> predicate);
     }

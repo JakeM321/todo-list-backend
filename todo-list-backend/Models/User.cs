@@ -12,5 +12,6 @@ namespace todo_list_backend.Models
 		public string DisplayName { get; set; }
 		public string PasswordHash { get; set; }
 		public string Salt { get; set; }
+		public bool SsoUser { get; set; }
 	}
 }

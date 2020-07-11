@@ -12,7 +12,7 @@ namespace todo_list_backend.Controllers
     public class HomeController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<string> Index()
+        public string Index()
         {
             return "TODO list API";
         }
