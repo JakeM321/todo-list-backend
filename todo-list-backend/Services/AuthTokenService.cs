@@ -13,6 +13,7 @@ namespace todo_list_backend.Services
     {
         private IUserService _userService;
         private string _secret;
+
         public AuthTokenService(IUserService userService, IConfiguration configuration)
         {
             _userService = userService;
@@ -25,14 +26,14 @@ namespace todo_list_backend.Services
             {
                 var decoded = Utils.Authentication.Jwt.ReadToken<UserToken>(token, _secret);
 
-                var fiveMinutesFromNow = DateTimeOffset.UtcNow.AddMinutes(5).ToUnixTimeSeconds();
+                var refreshWindow = DateTimeOffset.UtcNow.AddMinutes(Constants.TOKEN_REFRESH_WINDOW_MINUTES).ToUnixTimeSeconds();
 
                 return _userService.FindById(decoded.userId).Get(
                     user => new AuthResult
                     {
                         Accepted = true,
                         User = new Option<UserDto>(user),
-                        Token = fiveMinutesFromNow > decoded.exp ? GenerateToken(user.Id) : token
+                        Token = refreshWindow > decoded.exp ? GenerateToken(user.Id) : token
                     },
                     () => new AuthResult { Accepted = false, Token = "", User = null }
                 );
@@ -54,7 +55,7 @@ namespace todo_list_backend.Services
         public string GenerateToken(int userId)
         {
             return Utils.Authentication.Jwt.BuildToken(new Dictionary<string, string> {
-                { "exp", DateTimeOffset.UtcNow.AddHours(2).ToUnixTimeSeconds().ToString() },
+                { "exp", DateTimeOffset.UtcNow.AddMinutes(Constants.TOKEN_LIFESPAN_MINUTES).ToUnixTimeSeconds().ToString() },
                 { "userId", userId.ToString() }
             }, _secret);
         }

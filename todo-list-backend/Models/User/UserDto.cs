@@ -15,6 +15,8 @@ namespace todo_list_backend.Models.User
 			SsoUser = record.SsoUser;
         }
 
+		public UserDto() { }
+
 		public int Id { get; set; }
 		public string Email { get; set; }
 		public string DisplayName { get; set; }
