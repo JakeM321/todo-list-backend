@@ -19,13 +19,11 @@ namespace todo_list_backend.Services
     {
         private IUserService _userService;
         private IAuthTokenService _authTokenService;
-        private string _secret;
 
-        public LoginService(IUserService userService, IAuthTokenService authTokenService, IConfiguration configuration)
+        public LoginService(IUserService userService, IAuthTokenService authTokenService)
         {
             _userService = userService;
             _authTokenService = authTokenService;
-            _secret = configuration.GetValue("TodoListApp:JWTSecret", "");
         }
 
         public AuthResult AuthenticateEmailAndPassword(EmailLoginDto payload)
@@ -49,7 +47,5 @@ namespace todo_list_backend.Services
                 }
             );
         }
-
-        
     }
 }

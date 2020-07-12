@@ -15,47 +15,6 @@ namespace todo_list_backend_tests
     [TestClass]
     public class AuthTokenServiceTests
     {
-        internal class MockUserService : IUserService
-        {
-            private UserDto user = new UserDto
-            {
-                Id = 500,
-                DisplayName = "Test user",
-                Email = "user@test.com",
-                SsoUser = false
-            };
-
-            public bool ComparePassword(int userId, string password)
-            {
-                return true;
-            }
-
-            public UserDto CreateSsoUser(string email, string displayName)
-            {
-                return user;
-            }
-
-            public UserDto CreateUserWithPassword(string email, string displayName, string password)
-            {
-                return user;
-            }
-
-            public Option<UserDto> FindByEmail(string email)
-            {
-                return new Option<UserDto>(user);
-            }
-
-            public Option<UserDto> FindByEmailRegistration(string email)
-            {
-                return new Option<UserDto>(user);
-            }
-
-            public Option<UserDto> FindById(int id)
-            {
-                return new Option<UserDto>(user);
-            }
-        }
-
         private IConfiguration config;
         private IAuthTokenService authService;
 
@@ -72,19 +31,19 @@ namespace todo_list_backend_tests
         [TestMethod]
         public void AuthenticateToken_Accepts_Token_From_GenerateToken()
         {
-            var token = authService.GenerateToken(500);
+            var token = authService.GenerateToken(TestData.user.Id);
             var authAttempt = authService.AuthenticateToken(token);
 
             var returnedUserId = authAttempt.User.Get(u => u.Id, () => 0);
 
             Assert.IsTrue(authAttempt.Accepted);
-            Assert.AreEqual(returnedUserId, 500);
+            Assert.AreEqual(returnedUserId, TestData.user.Id);
         }
 
         [TestMethod]
         public void AuthenticateToken_Does_Not_Unnecessarily_Refresh_Token()
         {
-            var token = authService.GenerateToken(500);
+            var token = authService.GenerateToken(TestData.user.Id);
             var authAttempt = authService.AuthenticateToken(token);
 
             Assert.AreEqual(token, authAttempt.Token);
@@ -103,12 +62,12 @@ namespace todo_list_backend_tests
 
             var tokenThatExpiresSoon = todo_list_backend.Utils.Authentication.Jwt.BuildToken(new Dictionary<string, string> {
                 { "exp", now.AddMinutes(0 - timeToSubtract).ToUnixTimeSeconds().ToString() },
-                { "userId", "500" }
+                { "userId", TestData.user.Id.ToString() }
             }, config.GetValue<string>("TodoListApp:JWTSecret"));
 
             var notAboutToExpire = todo_list_backend.Utils.Authentication.Jwt.BuildToken(new Dictionary<string, string> {
                 { "exp", now.AddHours(5).ToUnixTimeSeconds().ToString() },
-                { "userId", "500" }
+                { "userId", TestData.user.Id.ToString() }
             }, config.GetValue<string>("TodoListApp:JWTSecret"));
 
             var shouldReset = authService.AuthenticateToken(tokenThatExpiresSoon);
