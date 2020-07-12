@@ -7,8 +7,8 @@ using todo_list_backend.Types;
 
 namespace todo_list_backend.Services
 {
-    public interface ILoginService
+    public interface IOAuthProviderService
     {
-        public AuthResult AuthenticateEmailAndPassword(EmailLoginDto payload);
+        Task<Option<OAuthUserInfo>> ProcessGoogleCallback(string code);
     }
 }

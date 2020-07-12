@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using todo_list_backend.Models.Auth;
 using todo_list_backend.Repositories;
 using todo_list_backend.Services;
@@ -17,12 +19,24 @@ namespace todo_list_backend.Controllers
         private ILoginService _authenticationService;
         private IRegistrationService _registrationService;
         private IUserService _userService;
+        private IConfiguration _configuration;
+        private IOAuthHandlerService _oauthHandlerService;
+        private IOAuthProviderService _oauthProviderService;
 
-        public AuthController(ILoginService authenticationService, IRegistrationService registrationService, IUserService userService)
-        {
+        public AuthController(
+            ILoginService authenticationService,
+            IRegistrationService registrationService,
+            IUserService userService,
+            IConfiguration configuration,
+            IOAuthHandlerService oAuthHandlerService,
+            IOAuthProviderService oAuthProviderService
+        ) {
             _authenticationService = authenticationService;
             _registrationService = registrationService;
             _userService = userService;
+            _configuration = configuration;
+            _oauthHandlerService = oAuthHandlerService;
+            _oauthProviderService = oAuthProviderService;
         }
 
         [HttpPost]
@@ -61,6 +75,39 @@ namespace todo_list_backend.Controllers
         public bool EmailAvailability(string email)
         {
             return _userService.FindByEmail(email).Get(some => false, () => true);
+        }
+
+        [HttpGet]
+        [Route("oauth-redirect")]
+        public string OAuthRedirect()
+        {
+            return Utils.Authentication.Google.RedirectUrl(_configuration);
+        }
+
+        [HttpPost]
+        [Route("assert")]
+        public async Task<IActionResult> Assert([FromQuery] string code)
+        {
+            return (await _oauthProviderService.ProcessGoogleCallback(code)).Get<IActionResult>(
+                user => {
+                    var authentication = _oauthHandlerService.LoginOrRegister(user);
+
+                    return new JsonResult(new
+                    {
+                        valid = authentication.Accepted,
+                        token = authentication.Token,
+                        email = authentication.User.Get(user => user.Email, () => ""),
+                        displayName = authentication.User.Get(user => user.DisplayName, () => "")
+                    });
+                },
+                () => new JsonResult(new
+                {
+                    valid = false,
+                    token = "",
+                    email = "",
+                    displayName = ""
+                })
+            );
         }
     }
 }

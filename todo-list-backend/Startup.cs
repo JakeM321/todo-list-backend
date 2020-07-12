@@ -39,6 +39,8 @@ namespace todo_list_backend
             services.AddTransient<IAuthTokenService, AuthTokenService>();
             services.AddTransient<ILoginService, LoginService>();
             services.AddTransient<IRegistrationService, RegistrationService>();
+            services.AddTransient<IOAuthProviderService, OAuthProviderService>();
+            services.AddTransient<IOAuthHandlerService, OAuthHandlerService>();
         }
 
         private Option<string> GetHeader(HttpContext context, string key)
@@ -76,7 +78,7 @@ namespace todo_list_backend
 
             app.UseAuthorization();
 
-            var exemptRoutes = new[] { "email-login", "email-register", "email-availability" };
+            var exemptRoutes = new[] { "email-login", "email-register", "email-availability", "oauth-redirect", "assert" };
 
             app.UseWhen(
                 context => !exemptRoutes.Any(route => context.Request.Path.Value.Contains(route)),
