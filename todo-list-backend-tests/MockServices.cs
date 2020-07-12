@@ -23,10 +23,12 @@ namespace todo_list_backend_tests
     {
         private UserDto user = TestData.user;
         private bool _acceptPassword;
+        private bool _returnDefaultUser;
 
-        public MockUserService(bool acceptPassword = true)
+        public MockUserService(bool acceptPassword = true, bool returnDefaultUser = true)
         {
             _acceptPassword = acceptPassword;
+            _returnDefaultUser = returnDefaultUser;
         }
 
         public bool ComparePassword(int userId, string password)
@@ -46,17 +48,17 @@ namespace todo_list_backend_tests
 
         public Option<UserDto> FindByEmail(string email)
         {
-            return new Option<UserDto>(user);
+            return _returnDefaultUser ? new Option<UserDto>(user) : new Option<UserDto>();
         }
 
         public Option<UserDto> FindByEmailRegistration(string email)
         {
-            return new Option<UserDto>(user);
+            return _returnDefaultUser ? new Option<UserDto>(user) : new Option<UserDto>();
         }
 
         public Option<UserDto> FindById(int id)
         {
-            return new Option<UserDto>(user);
+            return _returnDefaultUser ? new Option<UserDto>(user) : new Option<UserDto>();
         }
     }
 
