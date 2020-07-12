@@ -35,7 +35,10 @@ namespace todo_list_backend
             services.AddControllers();
             services.AddDbContext<AppDbContext>(options => options.UseSqlite(SqliteSetup.ConnectionString));
             services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IAuthTokenService, AuthTokenService>();
+            services.AddTransient<ILoginService, LoginService>();
+            services.AddTransient<IRegistrationService, RegistrationService>();
         }
 
         private Option<string> GetHeader(HttpContext context, string key)
@@ -77,8 +80,8 @@ namespace todo_list_backend
             {
                 await GetHeader(context, "token").Get(async token =>
                 {
-                    var authenticationService = context.RequestServices.GetRequiredService<IAuthenticationService>();
-                    var authAttempt = authenticationService.AuthenticateToken(token);
+                    var authTokenService = context.RequestServices.GetRequiredService<IAuthTokenService>();
+                    var authAttempt = authTokenService.AuthenticateToken(token);
 
                     if (authAttempt.Accepted)
                     {

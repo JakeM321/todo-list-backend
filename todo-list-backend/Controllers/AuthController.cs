@@ -14,18 +14,20 @@ namespace todo_list_backend.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private IAuthenticationService _authenticationService;
+        private ILoginService _authenticationService;
+        private IRegistrationService _registrationService;
 
-        public AuthController(IAuthenticationService authenticationService)
+        public AuthController(ILoginService authenticationService, IRegistrationService registrationService)
         {
             _authenticationService = authenticationService;
+            _registrationService = registrationService;
         }
 
         [HttpPost]
         [Route("email-login")]
-        public IActionResult EmailLogin([FromBody] EmailLoginPayload payload)
+        public IActionResult EmailLogin([FromBody] EmailLoginDto payload)
         {
-            var result = _authenticationService.AuthenticateEmailAndPassword(payload.email, payload.password);
+            var result = _authenticationService.AuthenticateEmailAndPassword(payload);
 
             return new JsonResult(new
             {
@@ -34,6 +36,22 @@ namespace todo_list_backend.Controllers
                 email = result.User.Get(user => user.Email, () => ""),
                 displayName = result.User.Get(user => user.DisplayName, () => "")
             });
+        }
+
+        [HttpPost]
+        [Route("email-register")]
+        public IActionResult EmailRegister([FromBody] EmailRegisterDto payload)
+        {
+            var result = _registrationService.RegisterWithEmailAndPassword(payload);
+
+            return new JsonResult(new
+            {
+                valid = result.UserAvailable,
+                accountAlreadyInUse = !result.UserAvailable,
+                token = result.Token,
+                email = result.User.Get(user => user.Email, () => ""),
+                displayName = result.User.Get(user => user.DisplayName, () => "")
+            }) ;
         }
     }
 }

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace todo_list_backend.Models.Auth
 {
-    public class EmailLoginPayload
+    public class EmailLoginDto
     {
-        public string email { get; set; }
-        public string password { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }
