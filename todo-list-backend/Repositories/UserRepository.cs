@@ -38,6 +38,7 @@ namespace todo_list_backend.Repositories
         public UserRecord CreateUser(UserRecord user)
         {
             var result = _db.Users.Add(user);
+            _db.SaveChanges();
             return result.Entity;
         }
     }
