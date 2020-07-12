@@ -16,11 +16,13 @@ namespace todo_list_backend.Controllers
     {
         private ILoginService _authenticationService;
         private IRegistrationService _registrationService;
+        private IUserService _userService;
 
-        public AuthController(ILoginService authenticationService, IRegistrationService registrationService)
+        public AuthController(ILoginService authenticationService, IRegistrationService registrationService, IUserService userService)
         {
             _authenticationService = authenticationService;
             _registrationService = registrationService;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -52,6 +54,13 @@ namespace todo_list_backend.Controllers
                 email = result.User.Get(user => user.Email, () => ""),
                 displayName = result.User.Get(user => user.DisplayName, () => "")
             }) ;
+        }
+
+        [HttpGet]
+        [Route("email-availability/{email}")]
+        public bool EmailAvailability(string email)
+        {
+            return _userService.FindByEmail(email).Get(some => false, () => true);
         }
     }
 }

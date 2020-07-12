@@ -76,7 +76,11 @@ namespace todo_list_backend
 
             app.UseAuthorization();
 
-            app.UseWhen(context => !context.Request.Path.Value.Contains("email-login"), builder => builder.Use(async (context, next) =>
+            var exemptRoutes = new[] { "email-login", "email-register", "email-availability" };
+
+            app.UseWhen(
+                context => !exemptRoutes.Any(route => context.Request.Path.Value.Contains(route)),
+                builder => builder.Use(async (context, next) =>
             {
                 await GetHeader(context, "token").Get(async token =>
                 {
