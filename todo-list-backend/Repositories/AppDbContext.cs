@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using todo_list_backend.Models.Notification;
 using todo_list_backend.Models.User;
 
 namespace todo_list_backend.Repositories
@@ -15,5 +16,6 @@ namespace todo_list_backend.Repositories
         }
 
         public DbSet<UserRecord> Users { get; set; }
+        public DbSet<UserNotificationRecord> Notifications { get; set; }
     }
 }

@@ -19,22 +19,23 @@ namespace todo_list_backend.Services
             _authTokenService = authTokenService;
         }
 
-        private AuthResult Authenticate(UserDto user)
+        private SsoAuthResult Authenticate(UserDto user, bool isNew)
         {
-            return new AuthResult
+            return new SsoAuthResult
             {
                 Accepted = true,
                 Token = _authTokenService.GenerateToken(user.Id),
-                User = new Option<UserDto>(user)
+                User = new Option<UserDto>(user),
+                UserNewlyCreated = isNew
             };
         }
 
-        public AuthResult LoginOrRegister(OAuthUserInfo user)
+        public SsoAuthResult LoginOrRegister(OAuthUserInfo user)
         {
-            return _userService.FindByEmail(user.Email).Get(existingUser => Authenticate(existingUser), () =>
+            return _userService.FindByEmail(user.Email).Get(existingUser => Authenticate(existingUser, false), () =>
             {
                 var newUser = _userService.CreateSsoUser(user.Email, String.Format("{0} {1}", user.FirstName, user.LastName));
-                return Authenticate(newUser);
+                return Authenticate(newUser, true);
             });
         }
     }

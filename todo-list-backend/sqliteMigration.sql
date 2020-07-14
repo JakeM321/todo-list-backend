@@ -7,4 +7,12 @@ CREATE TABLE Users (
 	SsoUser INTEGER
 );
 
-INSERT INTO Users VALUES (1, 'admin@admin.com', 'Super user', '\u002BKjsGU6qjAoIHzpNJm5iUfYkNtwW00Zy1L6v6kg38B8=', 'I7J5RhwbXbWlUKxad2algg==', 0);
+CREATE TABLE Notifications (
+	Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId INTEGER,
+    Subject TEXT,
+    Message TEXT,
+    isLink INTEGER,
+    Link TEXT,
+    Seen INTEGER
+);

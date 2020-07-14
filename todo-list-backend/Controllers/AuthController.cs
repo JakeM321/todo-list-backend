@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using todo_list_backend.Models.Auth;
+using todo_list_backend.Models.Notification;
 using todo_list_backend.Repositories;
 using todo_list_backend.Services;
 
@@ -22,6 +23,7 @@ namespace todo_list_backend.Controllers
         private IConfiguration _configuration;
         private IOAuthHandlerService _oauthHandlerService;
         private IOAuthProviderService _oauthProviderService;
+        private INotificationSenderService _notificationSenderService;
 
         public AuthController(
             ILoginService authenticationService,
@@ -29,7 +31,8 @@ namespace todo_list_backend.Controllers
             IUserService userService,
             IConfiguration configuration,
             IOAuthHandlerService oAuthHandlerService,
-            IOAuthProviderService oAuthProviderService
+            IOAuthProviderService oAuthProviderService,
+            INotificationSenderService notificationSenderService
         ) {
             _authenticationService = authenticationService;
             _registrationService = registrationService;
@@ -37,6 +40,19 @@ namespace todo_list_backend.Controllers
             _configuration = configuration;
             _oauthHandlerService = oAuthHandlerService;
             _oauthProviderService = oAuthProviderService;
+            _notificationSenderService = notificationSenderService;
+        }
+
+        private void SendWelcomeMessage(int userId)
+        {
+            _notificationSenderService.SendNotificationAsync(new CreateUserNotificationDto
+            {
+                UserId = userId,
+                Subject = "Welcome",
+                Message = "Welcome to the TODO list app",
+                isLink = false,
+                Link = ""
+            }, 5000);
         }
 
         [HttpPost]
@@ -59,6 +75,11 @@ namespace todo_list_backend.Controllers
         public IActionResult EmailRegister([FromBody] EmailRegisterDto payload)
         {
             var result = _registrationService.RegisterWithEmailAndPassword(payload);
+
+            if (result.UserAvailable)
+            {
+                result.User.Use(user => SendWelcomeMessage(user.Id));
+            }
 
             return new JsonResult(new
             {
@@ -91,6 +112,11 @@ namespace todo_list_backend.Controllers
             return (await _oauthProviderService.ProcessGoogleCallback(code)).Get<IActionResult>(
                 user => {
                     var authentication = _oauthHandlerService.LoginOrRegister(user);
+
+                    if (authentication.UserNewlyCreated)
+                    {
+                        authentication.User.Use(user => SendWelcomeMessage(user.Id));
+                    }
 
                     return new JsonResult(new
                     {

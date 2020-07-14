@@ -13,9 +13,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using todo_list_backend.Repositories;
 using todo_list_backend.Services;
+using todo_list_backend.SignalR;
 using todo_list_backend.Types;
 
 namespace todo_list_backend
@@ -33,6 +35,8 @@ namespace todo_list_backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSignalR();
+
             services.AddDbContext<AppDbContext>(options => options.UseSqlite(SqliteSetup.ConnectionString));
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserService, UserService>();
@@ -41,13 +45,18 @@ namespace todo_list_backend
             services.AddTransient<IRegistrationService, RegistrationService>();
             services.AddTransient<IOAuthProviderService, OAuthProviderService>();
             services.AddTransient<IOAuthHandlerService, OAuthHandlerService>();
+            services.AddTransient<INotificationRepository, NotificationRepository>();
+            services.AddSingleton<INotificationHubManager, NotificationHubManager>();
+            services.AddTransient<INotificationSenderService, NotificationSenderService>();
         }
 
-        private Option<string> GetHeader(HttpContext context, string key)
+        private Option<string> GetData(HttpContext context, string key, Func<HttpContext, IEnumerable<KeyValuePair<string, StringValues>>> selector)
         {
-            if (context.Request.Headers.ContainsKey(key))
+            var collection = selector.Invoke(context).ToDictionary(x => x.Key, x => x.Value);
+            
+            if (collection.ContainsKey(key))
             {
-                var data = context.Request.Headers[key];
+                var data = collection[key];
                 return data.Count > 0 ? new Option<string>(data[0]) : new Option<string>();
             }
             else
@@ -56,18 +65,32 @@ namespace todo_list_backend
             }
         }
 
+        private Option<string> GetHeader(HttpContext context, string key)
+        {
+            return GetData(context, key, ctx => ctx.Request.Headers);
+        }
+
+        private Option<string> GetQueryParam(HttpContext context, string key)
+        {
+            return GetData(context, key, ctx => ctx.Request.Query);
+        }
+
+        private Option<string> GetToken(HttpContext context)
+        {
+            var key = "token";
+
+            return GetHeader(context, key).Get(
+                token => new Option<string>(token),
+                () => GetQueryParam(context, key)
+            );
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseCors(policy =>
-                {
-                    policy.AllowAnyOrigin();
-                    policy.AllowAnyHeader();
-                    policy.AllowAnyMethod();
-                });
 
                 SqliteSetup.RunSetup();
             }
@@ -75,6 +98,14 @@ namespace todo_list_backend
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(policy =>
+            {
+                policy.WithOrigins("http://localhost:4200")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            });
 
             app.UseAuthorization();
 
@@ -84,7 +115,7 @@ namespace todo_list_backend
                 context => !exemptRoutes.Any(route => context.Request.Path.Value.Contains(route)),
                 builder => builder.Use(async (context, next) =>
             {
-                await GetHeader(context, "token").Get(async token =>
+                await GetToken(context).Get(async token =>
                 {
                     var authTokenService = context.RequestServices.GetRequiredService<IAuthTokenService>();
                     var authAttempt = authTokenService.AuthenticateToken(token);
@@ -93,7 +124,7 @@ namespace todo_list_backend
                     {
                         var newToken = authAttempt.Token;
                         context.Response.Headers.Add("token", newToken);
-                        context.Items.Add("user", authAttempt.User);
+                        context.Items.Add("user", authAttempt.User.Get(user => user, () => null));
 
                         await next.Invoke();
                     }
@@ -112,7 +143,9 @@ namespace todo_list_backend
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/notification");
             });
+
         }
     }
 }

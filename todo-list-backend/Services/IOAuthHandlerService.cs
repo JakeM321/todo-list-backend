@@ -9,6 +9,6 @@ namespace todo_list_backend.Services
 {
     public interface IOAuthHandlerService
     {
-        AuthResult LoginOrRegister(OAuthUserInfo user);
+        SsoAuthResult LoginOrRegister(OAuthUserInfo user);
     }
 }
