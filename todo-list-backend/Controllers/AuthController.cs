@@ -84,7 +84,6 @@ namespace todo_list_backend.Controllers
             return new JsonResult(new
             {
                 valid = result.UserAvailable,
-                accountAlreadyInUse = !result.UserAvailable,
                 token = result.Token,
                 email = result.User.Get(user => user.Email, () => ""),
                 displayName = result.User.Get(user => user.DisplayName, () => "")
