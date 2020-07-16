@@ -14,11 +14,11 @@ namespace todo_list_backend.SignalR
     public class NotificationHub : Hub
     {
         private INotificationHubManager _manager;
-        private INotificationRepository _notificationRepository;
-        public NotificationHub(INotificationHubManager manager, INotificationRepository notificationRepository)
+        private INotificationProviderService _notificationProviderService;
+        public NotificationHub(INotificationHubManager manager, INotificationProviderService notificationProviderService)
         {
             _manager = manager;
-            _notificationRepository = notificationRepository;
+            _notificationProviderService = notificationProviderService;
         }
 
         private async Task SendInitialNotifications(SendUserNotificationDto[] notifications)
@@ -34,10 +34,8 @@ namespace todo_list_backend.SignalR
             var user = (UserDto)this.Context.GetHttpContext().Items["user"];
             _manager.RegisterConnection(user.Id, Context.ConnectionId);
 
-            var notifications = _notificationRepository
+            var notifications = _notificationProviderService
                 .GetUserNotifications(user.Id, 0, 20)
-                .OrderBy(n => n.Id)
-                .Select(record => new SendUserNotificationDto(record))
                 .ToArray();
 
             await base.OnConnectedAsync();

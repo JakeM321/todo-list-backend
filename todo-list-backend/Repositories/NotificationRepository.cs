@@ -26,9 +26,9 @@ namespace todo_list_backend.Repositories
             return newRecord.Entity;
         }
 
-        public IEnumerable<UserNotificationRecord> GetUserNotifications(int userId, int skip = 0, int take = 0)
+        public IEnumerable<UserNotificationRecord> GetUserNotifications(Func<UserNotificationRecord, bool> predicate)
         {
-            return _db.Notifications.Where(record => record.UserId == userId).Skip(skip).Take(take);
+            return _db.Notifications.Where(predicate);
         }
     }
 }

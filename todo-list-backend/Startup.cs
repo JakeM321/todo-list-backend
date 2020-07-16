@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using todo_list_backend.Repositories;
 using todo_list_backend.Services;
+using todo_list_backend.Services.Notifications;
 using todo_list_backend.SignalR;
 using todo_list_backend.Types;
 
@@ -48,6 +49,7 @@ namespace todo_list_backend
             services.AddTransient<INotificationRepository, NotificationRepository>();
             services.AddSingleton<INotificationHubManager, NotificationHubManager>();
             services.AddTransient<INotificationSenderService, NotificationSenderService>();
+            services.AddTransient<INotificationProviderService, NotificationProviderService>();
         }
 
         private Option<string> GetData(HttpContext context, string key, Func<HttpContext, IEnumerable<KeyValuePair<string, StringValues>>> selector)

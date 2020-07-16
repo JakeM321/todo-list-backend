@@ -9,6 +9,6 @@ namespace todo_list_backend.Services
     public interface INotificationRepository
     {
         UserNotificationRecord Save(UserNotificationRecord record);
-        IEnumerable<UserNotificationRecord> GetUserNotifications(int userId, int skip, int take);
+        IEnumerable<UserNotificationRecord> GetUserNotifications(Func<UserNotificationRecord, bool> predicate);
     }
 }
