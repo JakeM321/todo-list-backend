@@ -30,15 +30,7 @@ namespace todo_list_backend.Services
                 Seen = false
             });
 
-            return _notificationHubManager.SendNotificationAsync(new SendUserNotificationDto {
-                Id = record.Id,
-                UserId = record.UserId,
-                Subject = record.Subject,
-                Message = record.Message,
-                isLink = record.isLink,
-                Link = record.Link,
-                Seen = record.Seen
-            }, millsecondsDelay);
+            return _notificationHubManager.SendNotificationAsync(new SendUserNotificationDto(record), millsecondsDelay);
         }
     }
 }

@@ -17,13 +17,18 @@ namespace todo_list_backend.Repositories
         {
             _db = db;
             _logger = factory.CreateLogger("User Respository");
-        }
+        }        
 
         public UserNotificationRecord Save(UserNotificationRecord record)
         {
             var newRecord = _db.Add(record);
             _db.SaveChanges();
             return newRecord.Entity;
+        }
+
+        public IEnumerable<UserNotificationRecord> GetUserNotifications(int userId, int skip = 0, int take = 0)
+        {
+            return _db.Notifications.Where(record => record.UserId == userId).Skip(skip).Take(take);
         }
     }
 }
