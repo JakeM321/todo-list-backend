@@ -10,5 +10,6 @@ namespace todo_list_backend.Services
     {
         UserNotificationRecord Save(UserNotificationRecord record);
         IEnumerable<UserNotificationRecord> GetUserNotifications(Func<UserNotificationRecord, bool> predicate);
+        void UpdateNotifications(Func<UserNotificationRecord, bool> predicate, Func<UserNotificationRecord, UserNotificationRecord> update);
     }
 }

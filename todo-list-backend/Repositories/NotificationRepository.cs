@@ -30,5 +30,13 @@ namespace todo_list_backend.Repositories
         {
             return _db.Notifications.Where(predicate);
         }
+
+        public void UpdateNotifications(Func<UserNotificationRecord, bool> predicate, Func<UserNotificationRecord, UserNotificationRecord> update)
+        {
+            var existingRecords = _db.Notifications.Where(predicate);
+            var updatedRecords = existingRecords.Select(record => update(record));
+            _db.Notifications.UpdateRange(updatedRecords);
+            _db.SaveChanges();
+        }
     }
 }

@@ -23,5 +23,16 @@ namespace todo_list_backend.Services.Notifications
                 .Take(take)
                 .Select(record => new SendUserNotificationDto(record));
         }
+
+        public void MarkAsSeen(int[] notificationIds)
+        {
+            _notificationRepository.UpdateNotifications(
+                record => notificationIds.Contains(record.Id),
+                record => {
+                    record.Seen = true;
+                    return record;
+                }
+            );
+        }
     }
 }
