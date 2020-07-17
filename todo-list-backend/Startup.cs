@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -56,6 +57,13 @@ namespace todo_list_backend
             services.AddTransient<INotificationProviderService, NotificationProviderService>();
 
             services.AddAuthentication("Basic").AddScheme<AppAuthenticationOptions, AppAuthenticationHandler>("Basic", null);
+            
+            services.AddHttpContextAccessor();
+
+            services.AddSingleton<IAuthorizationHandler, NotificationOwnershipHandler>();
+            services.AddAuthorization(config => config.AddPolicy("VerifyNotificationOwnership", policy => {
+                policy.Requirements.Add(new NotificationsBelongToUserRequirement());
+            }));
         }
 
         private Option<string> GetData(HttpContext context, string key, Func<HttpContext, IEnumerable<KeyValuePair<string, StringValues>>> selector)
@@ -139,6 +147,7 @@ namespace todo_list_backend
                 });
             });
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
