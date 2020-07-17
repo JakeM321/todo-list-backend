@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using todo_list_backend.Handlers.Common;
 using todo_list_backend.Models.User;
 using todo_list_backend.Services;
 
 namespace todo_list_backend.Handlers
 {
-    public class NotificationOwnershipHandler : DeclarativeAuthHandler<int[], NotificationsBelongToUserRequirement>
+    public class NotificationOwnershipHandler : RequestBodyAuthortizationHandler<int[], NotificationsBelongToUserRequirement>
     {
         public NotificationOwnershipHandler(IServiceScopeFactory scopeFactory, IHttpContextAccessor httpContextAccessor) : base(scopeFactory, httpContextAccessor) { }
 

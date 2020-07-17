@@ -61,7 +61,7 @@ namespace todo_list_backend
             services.AddHttpContextAccessor();
 
             services.AddSingleton<IAuthorizationHandler, NotificationOwnershipHandler>();
-            services.AddAuthorization(config => config.AddPolicy("VerifyNotificationOwnership", policy => {
+            services.AddAuthorization(config => config.AddPolicy("NotificationsBelongToUser", policy => {
                 policy.Requirements.Add(new NotificationsBelongToUserRequirement());
             }));
         }

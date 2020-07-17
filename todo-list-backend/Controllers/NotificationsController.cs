@@ -21,7 +21,7 @@ namespace todo_list_backend.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "VerifyNotificationOwnership")]
+        [Authorize(Policy = "NotificationsBelongToUser")]
         [Route("mark-as-seen")]
         public IActionResult MarkAsSeen([FromBody] int[] notificationIds)
         {
