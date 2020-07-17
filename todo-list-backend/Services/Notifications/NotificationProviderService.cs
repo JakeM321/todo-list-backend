@@ -34,5 +34,14 @@ namespace todo_list_backend.Services.Notifications
                 }
             );
         }
+
+        public bool BelongsToUser(int[] notificationIds, int userId)
+        {
+            var anyNotificationsNotBelongingToUser = _notificationRepository
+                .GetUserNotifications(record => notificationIds.Contains(record.Id))
+                .Any(record => record.UserId != userId);
+
+            return !anyNotificationsNotBelongingToUser;
+        }
     }
 }

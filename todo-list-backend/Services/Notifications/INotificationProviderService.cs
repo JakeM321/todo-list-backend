@@ -10,5 +10,6 @@ namespace todo_list_backend.Services
     {
         IEnumerable<SendUserNotificationDto> GetUserNotifications(int userId, int skip, int take);
         void MarkAsSeen(int[] notificationIds);
+        bool BelongsToUser(int[] notificationIds, int userId);
     }
 }
