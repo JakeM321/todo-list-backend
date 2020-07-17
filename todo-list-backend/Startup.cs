@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using todo_list_backend.Handlers;
 using todo_list_backend.Repositories;
 using todo_list_backend.Services;
 using todo_list_backend.Services.Notifications;
@@ -50,6 +54,8 @@ namespace todo_list_backend
             services.AddSingleton<INotificationHubManager, NotificationHubManager>();
             services.AddTransient<INotificationSenderService, NotificationSenderService>();
             services.AddTransient<INotificationProviderService, NotificationProviderService>();
+
+            services.AddAuthentication("Basic").AddScheme<AppAuthenticationOptions, AppAuthenticationHandler>("Basic", null);
         }
 
         private Option<string> GetData(HttpContext context, string key, Func<HttpContext, IEnumerable<KeyValuePair<string, StringValues>>> selector)
@@ -109,38 +115,31 @@ namespace todo_list_backend
                     .AllowCredentials();
             });
 
-            app.UseAuthorization();
-
-            var exemptRoutes = new[] { "email-login", "email-register", "email-availability", "oauth-redirect", "assert" };
-
-            app.UseWhen(
-                context => !exemptRoutes.Any(route => context.Request.Path.Value.Contains(route)),
-                builder => builder.Use(async (context, next) =>
+            app.Use(async (context, next) =>
             {
                 await GetToken(context).Get(async token =>
                 {
-                    var authTokenService = context.RequestServices.GetRequiredService<IAuthTokenService>();
-                    var authAttempt = authTokenService.AuthenticateToken(token);
-
-                    if (authAttempt.Accepted)
+                    if (!String.IsNullOrEmpty(token))
                     {
-                        var newToken = authAttempt.Token;
-                        context.Response.Headers.Add("token", newToken);
-                        context.Items.Add("user", authAttempt.User.Get(user => user, () => null));
+                        var authTokenService = context.RequestServices.GetRequiredService<IAuthTokenService>();
+                        var authAttempt = authTokenService.AuthenticateToken(token);
 
-                        await next.Invoke();
+                        if (authAttempt.Accepted)
+                        {
+                            var newToken = authAttempt.Token;
+                            context.Response.Headers.Add("token", newToken);
+                            context.Items.Add("user", authAttempt.User.Get(user => user, () => null));
+                        }
                     }
-                    else
-                    {
-                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                        await context.Response.WriteAsync("unauthorized");
-                    }
-                }, async () =>
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    await context.Response.WriteAsync("unauthorized");
+
+                    await next.Invoke();
+
+                }, async () => {
+                    await next.Invoke();
                 });
-            }));
+            });
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
