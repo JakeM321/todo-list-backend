@@ -16,3 +16,23 @@ CREATE TABLE Notifications (
     Link TEXT,
     Seen INTEGER
 );
+
+CREATE TABLE Projects (
+	Id INTEGER PRIMARY KEY AUTOINCREMENT,
+	UserId INTEGER,
+	Title TEXT,
+	Colour TEXT
+);
+
+CREATE TABLE ProjectMembership (
+	UserId INTEGER,
+	ProjectId INTEGER
+);
+
+CREATE TABLE ProjectTask (
+	Id INTEGER PRIMARY KEY AUTOINCREMENT,
+	ProjectId INTEGER,
+	UserId INTEGER,
+	Name TEXT,
+	Description TEXT
+);

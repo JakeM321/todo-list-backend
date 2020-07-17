@@ -23,6 +23,7 @@ using todo_list_backend.Handlers;
 using todo_list_backend.Repositories;
 using todo_list_backend.Services;
 using todo_list_backend.Services.Notifications;
+using todo_list_backend.Services.Project;
 using todo_list_backend.SignalR;
 using todo_list_backend.Types;
 
@@ -55,15 +56,27 @@ namespace todo_list_backend
             services.AddSingleton<INotificationHubManager, NotificationHubManager>();
             services.AddTransient<INotificationSenderService, NotificationSenderService>();
             services.AddTransient<INotificationProviderService, NotificationProviderService>();
+            services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddTransient<IProjectMembershipRepository, ProjectMembershipRepository>();
+            services.AddTransient<IProjectTaskRepository, ProjectTaskRepository>();
+            services.AddTransient<IProjectService, ProjectService>();
 
             services.AddAuthentication("Basic").AddScheme<AppAuthenticationOptions, AppAuthenticationHandler>("Basic", null);
             
             services.AddHttpContextAccessor();
 
             services.AddSingleton<IAuthorizationHandler, NotificationOwnershipHandler>();
-            services.AddAuthorization(config => config.AddPolicy("NotificationsBelongToUser", policy => {
-                policy.Requirements.Add(new NotificationsBelongToUserRequirement());
-            }));
+            services.AddSingleton<IAuthorizationHandler, ProjectMembershipHandler>();
+
+            services.AddAuthorization(config => {
+                config.AddPolicy("NotificationsBelongToUser", policy => {
+                    policy.Requirements.Add(new NotificationsBelongToUserRequirement());
+                });
+
+                config.AddPolicy("HasProjectMembership", policy => {
+                    policy.Requirements.Add(new UserHasProjectMembershipRequirement());
+                });
+            });
         }
 
         private Option<string> GetData(HttpContext context, string key, Func<HttpContext, IEnumerable<KeyValuePair<string, StringValues>>> selector)
