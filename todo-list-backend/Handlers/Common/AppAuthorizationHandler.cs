@@ -29,12 +29,19 @@ namespace todo_list_backend.Handlers.Common
             {
                 var httpContext = _httpContextAccessor.HttpContext;
 
-                var user = (UserDto)httpContext.Items["user"];
-                var valid = await ValidateRequestAsync(scope.ServiceProvider, user, httpContext.Request);
-
-                if (valid)
+                if (httpContext.Items.ContainsKey("user"))
                 {
-                    context.Succeed(requirement);
+                    var user = (UserDto)httpContext.Items["user"];
+                    var valid = await ValidateRequestAsync(scope.ServiceProvider, user, httpContext.Request);
+
+                    if (valid)
+                    {
+                        context.Succeed(requirement);
+                    }
+                    else
+                    {
+                        context.Fail();
+                    }
                 }
                 else
                 {
