@@ -67,6 +67,7 @@ namespace todo_list_backend
 
             services.AddSingleton<IAuthorizationHandler, NotificationOwnershipHandler>();
             services.AddSingleton<IAuthorizationHandler, ProjectMembershipHandler>();
+            services.AddSingleton<IAuthorizationHandler, ProjectTaskCheckHandler>();
 
             services.AddAuthorization(config => {
                 config.AddPolicy("NotificationsBelongToUser", policy => {
@@ -75,6 +76,10 @@ namespace todo_list_backend
 
                 config.AddPolicy("HasProjectMembership", policy => {
                     policy.Requirements.Add(new UserHasProjectMembershipRequirement());
+                });
+
+                config.AddPolicy("TaskBelongsToProject", policy => {
+                    policy.Requirements.Add(new TaskBelongsToProjectRequirement());
                 });
             });
         }

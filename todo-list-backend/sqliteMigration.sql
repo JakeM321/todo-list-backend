@@ -36,5 +36,6 @@ CREATE TABLE ProjectTasks (
 	ProjectId INTEGER,
 	UserId INTEGER,
 	Label TEXT,
-	Description TEXT
+	Description TEXT,
+	Completed INT
 );

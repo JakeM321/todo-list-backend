@@ -11,17 +11,17 @@ namespace todo_list_backend.Models.Project.Dto
     {
         public ProjectTaskDto() { }
         
-        public ProjectTaskDto(ProjectTaskRecord record, UserRecord assignedTo, bool completed) {
+        public ProjectTaskDto(ProjectTaskRecord record, UserRecord assignedTo) {
             Id = record.Id;
             ProjectId = record.ProjectId;
             Label = record.Label;
             Description = record.Description;
+            Completed = record.Completed;
             AssignedTo = new ProjectMemberDto
             {
                 DisplayName = assignedTo.DisplayName,
                 Email = assignedTo.Email
             };
-            Completed = completed;
         }
 
         public int Id { get; set; }

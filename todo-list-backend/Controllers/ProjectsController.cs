@@ -121,5 +121,18 @@ namespace todo_list_backend.Controllers
                 return Ok();
             });
         }
+
+        [HttpPatch]
+        [Route("tasks/set-completion")]
+        [Authorize(Policy = "HasProjectMembership")]
+        [Authorize(Policy = "TaskBelongsToProject")]
+        public IActionResult SetCompletion([FromQuery] int projectTaskId, [FromBody] ToggleCompletionDto dto)
+        {
+            return withUser(Request, user =>
+            {
+                _projectService.SetCompletion(user.Id, projectTaskId, dto.Completed);
+                return Ok();
+            });
+        }
     }
 }

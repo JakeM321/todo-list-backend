@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using todo_list_backend.Models.Project.Record;
 using todo_list_backend.Models.User;
+using todo_list_backend.Types;
 
 namespace todo_list_backend.Repositories
 {
@@ -32,6 +33,21 @@ namespace todo_list_backend.Repositories
                 select new Tuple<ProjectTaskRecord, UserRecord>(task, user);
 
             return query.Skip(skip).Take(take);
+        }
+
+        public Option<ProjectTaskRecord> Find(Func<ProjectTaskRecord, bool> predicate)
+        {
+            var search = _db.ProjectTasks.Where(predicate);
+            return search.Any() ? new Option<ProjectTaskRecord>(search.First()) : new Option<ProjectTaskRecord>();
+        }
+
+        public void Update(Func<ProjectTaskRecord, bool> predicate, Func<ProjectTaskRecord, ProjectTaskRecord> transformer)
+        {
+            var entities = _db.ProjectTasks.Where(predicate);
+            var updates = entities.Select(transformer);
+
+            _db.ProjectTasks.UpdateRange(updates);
+            _db.SaveChanges();
         }
     }
 }

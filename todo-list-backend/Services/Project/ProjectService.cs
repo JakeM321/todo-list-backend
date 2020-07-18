@@ -137,5 +137,26 @@ namespace todo_list_backend.Services.Project
                 }
             );
         }
+
+        public void SetCompletion(int userId, int projectTaskId, bool completed)
+        {
+            _projectTaskRepository.Update(
+                r => r.Id == projectTaskId && r.UserId == userId,
+                record => {
+                    record.Completed = completed;
+                    return record;
+                }
+            );
+        }
+
+        public bool VerifyTaskBelongsToProject(int projectId, int projectTaskId)
+        {
+            return _projectTaskRepository
+                .Find(r => r.Id == projectTaskId)
+                .Get(
+                    record => record.ProjectId == projectId,
+                    () => false
+                );
+        }
     }
 }

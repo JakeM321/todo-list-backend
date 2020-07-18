@@ -12,5 +12,6 @@ namespace todo_list_backend.Models.Project.Record
         public int UserId { get; set; }
         public string Label { get; set; }
         public string Description { get; set; }
+        public bool Completed { get; set; }
     }
 }
