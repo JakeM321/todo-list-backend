@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using todo_list_backend.Models.Project.Record;
+using todo_list_backend.Types;
 
 namespace todo_list_backend.Repositories
 {
@@ -21,6 +22,12 @@ namespace todo_list_backend.Repositories
         public IEnumerable<ProjectRecord> List(Func<ProjectRecord, bool> predicate, int skip, int take)
         {
             return _db.Projects.Where(predicate).Skip(skip).Take(take);
+        }
+
+        public Option<ProjectRecord> Find(Func<ProjectRecord, bool> predicate)
+        {
+            var search = _db.Projects.Where(predicate);
+            return search.Any() ? new Option<ProjectRecord>(search.First()) : new Option<ProjectRecord>();
         }
         
         public ProjectRecord Save(ProjectRecord record)

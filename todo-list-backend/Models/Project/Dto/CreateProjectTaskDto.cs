@@ -7,8 +7,8 @@ namespace todo_list_backend.Models.Project.Dto
 {
     public class CreateProjectTaskDto
     {
-        public int UserId { get; set; }
-        public string Name { get; set; }
+        public string Label { get; set; }
         public string Description { get; set; }
+        public ProjectMemberDto AssignedTo { get; set; }
     }
 }

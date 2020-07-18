@@ -24,15 +24,16 @@ CREATE TABLE Projects (
 	Colour TEXT
 );
 
-CREATE TABLE ProjectMembership (
+CREATE TABLE ProjectMemberships (
+	Id INTEGER PRIMARY KEY AUTOINCREMENT,
 	UserId INTEGER,
 	ProjectId INTEGER
 );
 
-CREATE TABLE ProjectTask (
+CREATE TABLE ProjectTasks (
 	Id INTEGER PRIMARY KEY AUTOINCREMENT,
 	ProjectId INTEGER,
 	UserId INTEGER,
-	Name TEXT,
+	Label TEXT,
 	Description TEXT
 );

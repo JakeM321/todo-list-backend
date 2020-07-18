@@ -57,5 +57,10 @@ namespace todo_list_backend.Types
                 item = _item
             };
         }
+
+        public bool Some
+        {
+            get { return _some; }
+        }
     }
 }

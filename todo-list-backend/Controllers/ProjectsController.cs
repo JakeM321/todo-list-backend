@@ -58,6 +58,18 @@ namespace todo_list_backend.Controllers
         }
 
         [HttpGet]
+        [Route("info")]
+        [Authorize(Policy = "HasProjectMembership")]
+        public IActionResult ProjectInfo([FromQuery] int projectId)
+        {
+            return withUser(Request, user =>
+            {
+                var result = _projectService.GetInfo(user.Id, projectId);
+                return new JsonResult(result.ToJson());
+            });
+        }
+
+        [HttpGet]
         [Route("tasks")]
         [Authorize(Policy = "HasProjectMembership")]
         public IActionResult Tasks([FromQuery] int projectId, [FromQuery] int skip, [FromQuery] int take)
@@ -82,11 +94,20 @@ namespace todo_list_backend.Controllers
         [Authorize(Policy = "HasProjectMembership")]
         public IActionResult CreateTask([FromQuery] int projectId, CreateProjectTaskDto dto)
         {
-            return withUser(Request, user =>
-            {
-                var result = _projectService.CreateProjectTask(projectId, dto);
-                return new JsonResult(result);
-            });
+            var result = _projectService.CreateProjectTask(projectId, dto);
+
+            return result.ValidUser
+                ? new JsonResult(new { result.Id }) 
+                : ValidationProblem("Cannot assign a task on this project to a non-member");
+        }
+
+        [HttpGet]
+        [Route("members")]
+        [Authorize(Policy = "HasProjectMembership")]
+        public IActionResult ListMembers([FromQuery] int projectId)
+        {
+            var result = _projectService.ListMembers(projectId);
+            return new JsonResult(result);
         }
     }
 }

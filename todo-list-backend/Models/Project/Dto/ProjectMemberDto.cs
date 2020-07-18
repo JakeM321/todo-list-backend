@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace todo_list_backend.Models.Project.Dto
 {
-    public class CreateProjectTaskResultDto
+    public class ProjectMemberDto
     {
-        public int Id { get; set; }
-        public bool ValidUser { get; set; }
+        public string DisplayName { get; set; }
+        public string Email { get; set; }
     }
 }

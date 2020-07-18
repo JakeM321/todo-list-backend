@@ -10,12 +10,17 @@ namespace todo_list_backend.Models.Project.Dto
     {
         public ProjectDto() { }
 
-        public ProjectDto(ProjectRecord record)
+        public ProjectDto(ProjectRecord record, bool belongsToUser, bool isFavourite)
         {
             Id = record.Id;
             UserId = record.UserId;
             Title = record.Title;
             Colour = record.Colour;
+            BelongsToUser = belongsToUser;
+            IsFavourite = isFavourite;
         }
+
+        public bool BelongsToUser { get; set; }
+        public bool IsFavourite { get; set; }
     }
 }
