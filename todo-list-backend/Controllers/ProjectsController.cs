@@ -109,5 +109,17 @@ namespace todo_list_backend.Controllers
             var result = _projectService.ListMembers(projectId);
             return new JsonResult(result);
         }
+
+        [HttpPatch]
+        [Route("set-favourite")]
+        [Authorize(Policy = "HasProjectMembership")]
+        public IActionResult SetFavourite([FromQuery] int projectId, [FromBody] ToggleFavouriteDto dto)
+        {
+            return withUser(Request, user =>
+            {
+                _projectService.SetFavourite(user.Id, projectId, dto.Favourite);
+                return Ok();
+            });
+        }
     }
 }

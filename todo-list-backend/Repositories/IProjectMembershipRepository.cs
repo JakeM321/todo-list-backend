@@ -15,5 +15,6 @@ namespace todo_list_backend.Repositories
         IEnumerable<Tuple<ProjectMembershipRecord, UserRecord>> ListWithUsers(Func<ProjectMembershipRecord, bool> predicate);
         Option<ProjectMembershipRecord> Find(Func<ProjectMembershipRecord, bool> predicate);
         void Save(ProjectMembershipRecord record);
+        void Update(Func<ProjectMembershipRecord, bool> predicate, Func<ProjectMembershipRecord, ProjectMembershipRecord> transformer);
     }
 }

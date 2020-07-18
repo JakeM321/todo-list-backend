@@ -45,21 +45,27 @@ namespace todo_list_backend.Services.Project
         public ProjectDto[] ListProjects(int userId, int skip, int take)
         {
             var memberships = _projectMembershipRepository.List(membership => membership.UserId == userId);
-            var projectsForUser = memberships.Select(m => m.ProjectId).ToHashSet();
+            var projectsForUser = memberships.ToDictionary(m => m.ProjectId, m => m);
 
-            return _projectRepository.List(project => projectsForUser.Contains(project.UserId), skip, take)
-                .Select(record => new ProjectDto(record, record.UserId == userId, false))
+            return _projectRepository
+                .List(project => projectsForUser.ContainsKey(project.UserId), skip, take)
+                .Select(record => new ProjectDto(record, record.UserId == userId, projectsForUser[record.Id].IsFavourite ))
                 .ToArray();
         }
 
         public Option<ProjectDto> GetInfo(int userId, int projectId)
         {
-            return _projectRepository
-                .Find(record => record.Id == projectId)
-                .Get(
-                    record => new Option<ProjectDto>(new ProjectDto(record, record.UserId == userId, false)),
-                    () => new Option<ProjectDto>()
-                );
+            return _projectMembershipRepository
+                .Find(membership => membership.UserId == userId && membership.ProjectId == projectId)
+                .Get(membership =>
+                {
+                    return _projectRepository
+                        .Find(record => record.Id == projectId)
+                        .Get(
+                            record => new Option<ProjectDto>(new ProjectDto(record, record.UserId == userId, membership.IsFavourite)),
+                            () => new Option<ProjectDto>()
+                        );
+                }, () => new Option<ProjectDto>());
         }
 
         private ProjectTaskDto[] GetDtos(IEnumerable<Tuple<ProjectTaskRecord, UserRecord>> records)
@@ -67,8 +73,7 @@ namespace todo_list_backend.Services.Project
             return records
                 .Select(pair => new ProjectTaskDto(
                     pair.Item1,
-                    pair.Item2,
-                    false
+                    pair.Item2
                  ))
                 .ToArray();
         }
@@ -120,6 +125,17 @@ namespace todo_list_backend.Services.Project
                     Email = pair.Item2.Email
                 })
                 .ToArray();
+        }
+
+        public void SetFavourite(int userId, int projectId, bool favourite)
+        {
+            _projectMembershipRepository.Update(
+                r => r.Id == projectId && r.UserId == userId,
+                record => {
+                    record.IsFavourite = favourite;
+                    return record;
+                }
+            );
         }
     }
 }

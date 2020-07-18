@@ -46,5 +46,13 @@ namespace todo_list_backend.Repositories
 
             return query;
         }
+
+        public void Update(Func<ProjectMembershipRecord, bool> predicate, Func<ProjectMembershipRecord, ProjectMembershipRecord> transformer)
+        {
+            var entities = _db.ProjectMemberships.Where(predicate);
+            var updates = entities.Select(transformer);
+            _db.UpdateRange(updates);
+            _db.SaveChanges();
+        }
     }
 }

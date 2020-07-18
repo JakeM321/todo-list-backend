@@ -27,7 +27,8 @@ CREATE TABLE Projects (
 CREATE TABLE ProjectMemberships (
 	Id INTEGER PRIMARY KEY AUTOINCREMENT,
 	UserId INTEGER,
-	ProjectId INTEGER
+	ProjectId INTEGER,
+	IsFavourite INTEGER
 );
 
 CREATE TABLE ProjectTasks (
