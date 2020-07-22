@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using todo_list_backend.Models.Project.Record;
 
-namespace todo_list_backend.Models.Project.Dto
+namespace todo_list_backend.Models.Project.Dto.Project
 {
     public class ProjectDto: ProjectRecord
     {

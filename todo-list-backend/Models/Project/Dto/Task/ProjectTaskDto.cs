@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using todo_list_backend.Models.Project.Dto.Membership;
 using todo_list_backend.Models.Project.Record;
 using todo_list_backend.Models.User;
 
-namespace todo_list_backend.Models.Project.Dto
+namespace todo_list_backend.Models.Project.Dto.Task
 {
     public class ProjectTaskDto
     {
