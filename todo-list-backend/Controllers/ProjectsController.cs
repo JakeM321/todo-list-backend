@@ -18,9 +18,14 @@ namespace todo_list_backend.Controllers
     public class ProjectsController : ApiController
     {
         private IProjectService _projectService;
-        public ProjectsController(IProjectService projectService)
+        private IProjectTaskService _projectTaskService;
+        private IProjectMembershipService _projectMembershipService;
+
+        public ProjectsController(IProjectService projectService, IProjectTaskService projectTaskService, IProjectMembershipService projectMembershipService)
         {
             _projectService = projectService;
+            _projectTaskService = projectTaskService;
+            _projectMembershipService = projectMembershipService;
         }
 
         [HttpPost]
@@ -62,7 +67,7 @@ namespace todo_list_backend.Controllers
         [Authorize(Policy = "HasProjectMembership")]
         public IActionResult Tasks([FromQuery] int projectId, [FromQuery] int skip, [FromQuery] int take)
         {
-            var result = _projectService.ListProjectTasks(projectId, skip, take);
+            var result = _projectTaskService.ListProjectTasks(projectId, skip, take);
             return new JsonResult(result);
         }
 
@@ -72,7 +77,7 @@ namespace todo_list_backend.Controllers
         {
             return withUser(Request, user =>
             {
-                var result = _projectService.ListUserTasks(user.Id, skip, take);
+                var result = _projectTaskService.ListUserTasks(user.Id, skip, take);
                 return new JsonResult(result);
             });
         }
@@ -82,7 +87,7 @@ namespace todo_list_backend.Controllers
         [Authorize(Policy = "HasProjectMembership")]
         public IActionResult CreateTask([FromQuery] int projectId, CreateProjectTaskDto dto)
         {
-            var result = _projectService.CreateProjectTask(projectId, dto);
+            var result = _projectTaskService.CreateProjectTask(projectId, dto);
 
             return result.ValidUser
                 ? new JsonResult(new { result.Id }) 
@@ -94,7 +99,7 @@ namespace todo_list_backend.Controllers
         [Authorize(Policy = "HasProjectMembership")]
         public IActionResult ListMembers([FromQuery] int projectId)
         {
-            var result = _projectService.ListMembers(projectId);
+            var result = _projectMembershipService.ListMembers(projectId);
             return new JsonResult(result);
         }
 
@@ -118,7 +123,7 @@ namespace todo_list_backend.Controllers
         {
             return withUser(Request, user =>
             {
-                _projectService.SetCompletion(user.Id, projectTaskId, dto.Completed);
+                _projectTaskService.SetCompletion(user.Id, projectTaskId, dto.Completed);
                 return Ok();
             });
         }

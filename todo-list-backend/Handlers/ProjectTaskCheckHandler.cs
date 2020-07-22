@@ -22,8 +22,8 @@ namespace todo_list_backend.Handlers
             {
                 return GetQueryParam<int>(query, "projectTaskId", Convert.ToInt32).Get(projectTaskId =>
                 {
-                    var projectService = serviceProvider.GetRequiredService<IProjectService>();
-                    return projectService.VerifyTaskBelongsToProject(projectId, projectTaskId);
+                    var projectTaskService = serviceProvider.GetRequiredService<IProjectTaskService>();
+                    return projectTaskService.VerifyTaskBelongsToProject(projectId, projectTaskId);
                 }, () => false);
             }, () => false);
         }

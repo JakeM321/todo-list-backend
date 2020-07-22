@@ -60,6 +60,8 @@ namespace todo_list_backend
             services.AddTransient<IProjectMembershipRepository, ProjectMembershipRepository>();
             services.AddTransient<IProjectTaskRepository, ProjectTaskRepository>();
             services.AddTransient<IProjectService, ProjectService>();
+            services.AddTransient<IProjectTaskService, ProjectTaskService>();
+            services.AddTransient<IProjectMembershipService, ProjectMembershipService>();
 
             services.AddAuthentication("Basic").AddScheme<AppAuthenticationOptions, AppAuthenticationHandler>("Basic", null);
             

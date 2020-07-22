@@ -12,13 +12,6 @@ namespace todo_list_backend.Services.Project
         CreateProjectResultDto CreateProject(int userId, CreateProjectDto dto);
         ProjectDto[] ListProjects(int userId, int skip, int take);
         Option<ProjectDto> GetInfo(int userId, int projectId);
-        ProjectTaskDto[] ListProjectTasks(int projectId, int skip, int take);
-        ProjectTaskDto[] ListUserTasks(int userId, int skip, int take);
-        bool VerifyMembership(int userId, int projectId);
-        CreateProjectTaskResultDto CreateProjectTask(int projectId, CreateProjectTaskDto dto);
-        ProjectMemberDto[] ListMembers(int projectId);
         void SetFavourite(int userId, int projectId, bool favourite);
-        void SetCompletion(int userId, int projectTaskId, bool favourite);
-        bool VerifyTaskBelongsToProject(int projectId, int projectTaskId);
     }
 }

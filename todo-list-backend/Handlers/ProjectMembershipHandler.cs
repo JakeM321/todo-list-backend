@@ -20,8 +20,8 @@ namespace todo_list_backend.Handlers
         {
             return GetQueryParam<int>(query, "projectId", Convert.ToInt32).Get(projectId =>
             {
-                var projectService = serviceProvider.GetRequiredService<IProjectService>();
-                return projectService.VerifyMembership(user.Id, projectId);
+                var projectMembershipService = serviceProvider.GetRequiredService<IProjectMembershipService>();
+                return projectMembershipService.VerifyMembership(user.Id, projectId);
             }, () => false);
         }
     }
