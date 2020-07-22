@@ -10,5 +10,6 @@ namespace todo_list_backend.Services.Project
     {
         bool VerifyMembership(int userId, int projectId);
         ProjectMemberDto[] ListMembers(int projectId);
+        void AddMember(int userId, int projectId);
     }
 }

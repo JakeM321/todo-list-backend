@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using todo_list_backend.Models.Project.Dto;
 using todo_list_backend.Models.User;
+using todo_list_backend.Services;
 using todo_list_backend.Services.Project;
 using todo_list_backend.Utils;
 
@@ -20,12 +21,18 @@ namespace todo_list_backend.Controllers
         private IProjectService _projectService;
         private IProjectTaskService _projectTaskService;
         private IProjectMembershipService _projectMembershipService;
+        private IUserService _userService;
 
-        public ProjectsController(IProjectService projectService, IProjectTaskService projectTaskService, IProjectMembershipService projectMembershipService)
+        public ProjectsController(
+            IProjectService projectService,
+            IProjectTaskService projectTaskService,
+            IProjectMembershipService projectMembershipService,
+            IUserService userService)
         {
             _projectService = projectService;
             _projectTaskService = projectTaskService;
             _projectMembershipService = projectMembershipService;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -124,6 +131,22 @@ namespace todo_list_backend.Controllers
             return withUser(Request, user =>
             {
                 _projectTaskService.SetCompletion(user.Id, projectTaskId, dto.Completed);
+                return Ok();
+            });
+        }
+
+        [HttpPost]
+        [Route("add-member")]
+        [Authorize(Policy = "HasProjectMembership")]
+        public IActionResult AddMemberToProject([FromQuery] int projectId, [FromBody] AddProjectMemberDto dto)
+        {
+            return _userService.FindByEmail(dto.Email).Get(user =>
+            {
+                _projectMembershipService.AddMember(user.Id, projectId);
+                return Ok();
+            }, () =>
+            {
+                //TODO: Implement invitation emails
                 return Ok();
             });
         }

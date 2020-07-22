@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using todo_list_backend.Models.Project.Dto;
+using todo_list_backend.Models.Project.Record;
 using todo_list_backend.Repositories;
 
 namespace todo_list_backend.Services.Project
@@ -33,6 +34,11 @@ namespace todo_list_backend.Services.Project
                     Email = pair.Item2.Email
                 })
                 .ToArray();
+        }
+
+        public void AddMember(int userId, int projectId)
+        {
+            _projectMembershipRepository.Save(new ProjectMembershipRecord { UserId = userId, ProjectId = projectId, IsFavourite = false });
         }
     }
 }
