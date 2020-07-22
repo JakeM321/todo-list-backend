@@ -9,7 +9,7 @@ namespace todo_list_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HomeController : ControllerBase
+    public class HomeController : ApiController
     {
         [HttpGet]
         public string Index()

@@ -8,31 +8,19 @@ using Microsoft.AspNetCore.Mvc;
 using todo_list_backend.Models.Project.Dto;
 using todo_list_backend.Models.User;
 using todo_list_backend.Services.Project;
+using todo_list_backend.Utils;
 
 namespace todo_list_backend.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
-    public class ProjectsController : ControllerBase
+    public class ProjectsController : ApiController
     {
         private IProjectService _projectService;
         public ProjectsController(IProjectService projectService)
         {
             _projectService = projectService;
-        }
-
-        private IActionResult withUser(HttpRequest request, Func<UserDto, IActionResult> callback)
-        {
-            var items = request.HttpContext.Items;
-            if (items.ContainsKey("user"))
-            {
-                var user = (UserDto)items["user"];
-                return callback.Invoke(user);
-            } else
-            {
-                return ValidationProblem();
-            }
         }
 
         [HttpPost]

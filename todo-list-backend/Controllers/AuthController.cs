@@ -17,7 +17,7 @@ namespace todo_list_backend.Controllers
     [Route("api/[controller]")]
     [AllowAnonymous]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiController
     {
         private ILoginService _authenticationService;
         private IRegistrationService _registrationService;

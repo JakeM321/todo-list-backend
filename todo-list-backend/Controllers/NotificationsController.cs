@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using todo_list_backend.Services;
+using todo_list_backend.Utils;
 
 namespace todo_list_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class NotificationsController : ControllerBase
+    [Authorize]
+    public class NotificationsController : ApiController
     {
         private INotificationProviderService _notificationProviderService;
 
@@ -30,11 +32,13 @@ namespace todo_list_backend.Controllers
         }
 
         [HttpGet]
-        [Authorize]
-        [Route("hello")]
-        public string Hello()
+        [Route("get-notifications")]
+        public IActionResult Notifications([FromQuery] int skip, [FromQuery] int take)
         {
-            return "Hi";
+            return withUser(Request, user => {
+                var result = _notificationProviderService.GetUserNotifications(user.Id, skip, take);
+                return new JsonResult(result);
+            });
         }
     }
 }
