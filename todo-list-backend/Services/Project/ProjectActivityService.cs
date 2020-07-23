@@ -30,7 +30,7 @@ namespace todo_list_backend.Services.Project
             IEnumerable<IComposibleProjectActivity> reports = 
                 _activityLogService
                     .Select<ActivityLogItem>(item => item, item => recognisedCategories.Contains(item.Category), skip, take)
-                    .Select(item => {
+                    .Select<ActivityLogItem, IComposibleProjectActivity>(item => {
                         switch (item.Category)
                         {
                             case Constants.ActivityLogCategories.TASK_ADDED:
