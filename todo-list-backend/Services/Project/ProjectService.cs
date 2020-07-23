@@ -44,7 +44,7 @@ namespace todo_list_backend.Services.Project
             var projectsForUser = memberships.ToDictionary(m => m.ProjectId, m => m);
 
             return _projectRepository
-                .List(project => projectsForUser.ContainsKey(project.UserId), skip, take)
+                .List(project => projectsForUser.ContainsKey(project.Id), skip, take)
                 .Select(record => new ProjectDto(record, record.UserId == userId, projectsForUser[record.Id].IsFavourite ))
                 .ToArray();
         }
