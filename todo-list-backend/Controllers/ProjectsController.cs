@@ -110,14 +110,12 @@ namespace todo_list_backend.Controllers
 
                 if (result.ValidUser)
                 {
-                    var recipients = _projectMembershipService.ListMembers(projectId).Select(i => i.UserId).Where(id => id != user.Id).ToArray();
-
                     _reportingService.Report(new TaskAddedReport
                     {
                         AddedByUserId = user.Id,
                         ProjectId = projectId,
                         ProjectTaskId = result.Id
-                    }, recipients);
+                    }, new int[] { dto.AssignedTo.UserId });
                 }
 
                 return result.ValidUser

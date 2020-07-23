@@ -29,7 +29,7 @@ namespace todo_list_backend.Models.Reporting.Dto
                 : 0;
         }
 
-        private string GetMessage(IServiceProvider services)
+        private string GetMessage(IServiceProvider services, bool addressingAssignee)
         {
             var userService = services.GetService<IUserService>();
             var projectTaskService = services.GetService<IProjectTaskService>();
@@ -41,9 +41,11 @@ namespace todo_list_backend.Models.Reporting.Dto
             {
                 return projectTaskService.Find(ProjectTaskId).Get(taskDto =>
                 {
-                    var assignmentWording = addedBy.DisplayName == taskDto.AssignedTo.DisplayName
-                        ? "self-assigned"
-                        : String.Format("assigned {0}", taskDto.AssignedTo.DisplayName);
+                    var assignmentWording = addressingAssignee 
+                        ? "assigned you"
+                        : addedBy.DisplayName == taskDto.AssignedTo.DisplayName
+                            ? "self-assigned"
+                            : String.Format("assigned {0}", taskDto.AssignedTo.DisplayName);
 
                     var message = String.Format("{0} {1} a new task: {2}",
                         addedBy.DisplayName,
@@ -63,7 +65,7 @@ namespace todo_list_backend.Models.Reporting.Dto
                 isLink = false,
                 Link = "",
                 Subject = String.Format("Task added to project"),
-                Message = GetMessage(services)
+                Message = GetMessage(services, true)
             };
         }
 
@@ -82,7 +84,7 @@ namespace todo_list_backend.Models.Reporting.Dto
         {
             return new ProjectActivityDto
             {
-                Description = GetMessage(services)
+                Description = GetMessage(services, false)
             };
         }
     }
