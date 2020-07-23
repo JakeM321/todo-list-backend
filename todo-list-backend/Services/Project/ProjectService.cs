@@ -67,7 +67,7 @@ namespace todo_list_backend.Services.Project
         public void SetFavourite(int userId, int projectId, bool favourite)
         {
             _projectMembershipRepository.Update(
-                r => r.Id == projectId && r.UserId == userId,
+                r => r.ProjectId == projectId && r.UserId == userId,
                 record => {
                     record.IsFavourite = favourite;
                     return record;
