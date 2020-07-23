@@ -110,12 +110,18 @@ namespace todo_list_backend.Controllers
 
                 if (result.ValidUser)
                 {
+                    var assigningTaskToSelf = user.Id == dto.AssignedTo.UserId;
+
+                    var recipientList = assigningTaskToSelf
+                        ? new int[] { }
+                        : new int[] { dto.AssignedTo.UserId };
+
                     _reportingService.Report(new TaskAddedReport
                     {
                         AddedByUserId = user.Id,
                         ProjectId = projectId,
                         ProjectTaskId = result.Id
-                    }, new int[] { dto.AssignedTo.UserId });
+                    }, recipientList);
                 }
 
                 return result.ValidUser
