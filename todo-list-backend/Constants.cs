@@ -13,6 +13,7 @@ namespace todo_list_backend
         public static class ActivityLogCategories
         {
             public const string TASK_ADDED = "TASK_ADDED";
+            public const string MEMBER_ADDED = "MEMBER_ADDED";
         }
     }
 }

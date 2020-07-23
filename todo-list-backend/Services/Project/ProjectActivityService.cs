@@ -22,7 +22,10 @@ namespace todo_list_backend.Services.Project
 
         public IEnumerable<ProjectActivityDto> GetProjectActivity(int projectId, int skip, int take)
         {
-            var recognisedCategories = new HashSet<string>(new string[] { Constants.ActivityLogCategories.TASK_ADDED });
+            var recognisedCategories = new HashSet<string>(new string[] { 
+                Constants.ActivityLogCategories.TASK_ADDED,
+                Constants.ActivityLogCategories.MEMBER_ADDED
+            });
 
             IEnumerable<IComposibleProjectActivity> reports = 
                 _activityLogService
@@ -32,6 +35,8 @@ namespace todo_list_backend.Services.Project
                         {
                             case Constants.ActivityLogCategories.TASK_ADDED:
                                 return new TaskAddedReport(item);
+                            case Constants.ActivityLogCategories.MEMBER_ADDED:
+                                return new MemberAddedReport(item);
                             default:
                                 throw new Exception("Unrecognised activity category");
                         }

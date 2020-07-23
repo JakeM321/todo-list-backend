@@ -163,14 +163,25 @@ namespace todo_list_backend.Controllers
         [Authorize(Policy = "HasProjectMembership")]
         public IActionResult AddMemberToProject([FromQuery] int projectId, [FromBody] AddProjectMemberDto dto)
         {
-            return _userService.FindByEmail(dto.Email).Get(user =>
+            return withUser(Request, requestingUser =>
             {
-                _projectMembershipService.AddMember(user.Id, projectId);
+                return _userService.FindByEmail(dto.Email).Get(userToAdd =>
+                {
+                    _projectMembershipService.AddMember(userToAdd.Id, projectId);
+
+                    _reportingService.Report(new MemberAddedReport
+                    {
+                        AddedByUserId = requestingUser.Id,
+                        MemberUserId = userToAdd.Id,
+                        ProjectId = projectId
+                    }, new int[] { userToAdd.Id });
+
                 return Ok();
-            }, () =>
-            {
-                //TODO: Implement invitation emails
-                return Ok();
+                }, () =>
+                {
+                    //TODO: Implement invitation emails
+                    return Ok();
+                });
             });
         }
 
