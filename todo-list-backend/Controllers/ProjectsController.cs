@@ -27,19 +27,22 @@ namespace todo_list_backend.Controllers
         private IProjectMembershipService _projectMembershipService;
         private IUserService _userService;
         private IReportingService _reportingService;
+        private IProjectActivityService _projectActivityService;
 
         public ProjectsController(
             IProjectService projectService,
             IProjectTaskService projectTaskService,
             IProjectMembershipService projectMembershipService,
             IUserService userService,
-            IReportingService reportingService)
+            IReportingService reportingService,
+            IProjectActivityService projectActivityService)
         {
             _projectService = projectService;
             _projectTaskService = projectTaskService;
             _projectMembershipService = projectMembershipService;
             _userService = userService;
             _reportingService = reportingService;
+            _projectActivityService = projectActivityService;
         }
 
         [HttpPost]
@@ -107,7 +110,7 @@ namespace todo_list_backend.Controllers
 
                 if (result.ValidUser)
                 {
-                    var recipients = _projectMembershipService.ListMembers(projectId).Select(i => i.UserId).ToArray();
+                    var recipients = _projectMembershipService.ListMembers(projectId).Select(i => i.UserId).Where(id => id != user.Id).ToArray();
 
                     _reportingService.Report(new TaskAddedReport
                     {
@@ -171,6 +174,15 @@ namespace todo_list_backend.Controllers
                 //TODO: Implement invitation emails
                 return Ok();
             });
+        }
+
+        [HttpGet]
+        [Route("activity")]
+        [Authorize(Policy = "HasProjectMembership")]
+        public IActionResult GetActivity([FromQuery] int projectId, [FromQuery] int skip, [FromQuery] int take)
+        {
+            var result = _projectActivityService.GetProjectActivity(projectId, skip, take);
+            return new JsonResult(result);
         }
     }
 }

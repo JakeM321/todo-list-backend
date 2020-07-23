@@ -68,6 +68,8 @@ namespace todo_list_backend
             services.AddTransient<IActivityLogService, ActivityLogService>();
             services.AddTransient<IReportingService, ReportingService>();
 
+            services.AddTransient<IProjectActivityService, ProjectActivityService>();
+
             services.AddAuthentication("Basic").AddScheme<AppAuthenticationOptions, AppAuthenticationHandler>("Basic", null);
             
             services.AddHttpContextAccessor();

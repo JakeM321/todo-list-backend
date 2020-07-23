@@ -22,7 +22,10 @@ namespace todo_list_backend.Repositories
         public void Save(ActivityLogItem item)
         {
             var record = _db.ActivityLog.Add(item);
+            _db.SaveChanges();
+
             var id = record.Entity.Id;
+
             item.Values.ToList().ForEach(pair => _db.ActivityLogValues.Add(new ActivityLogValue
             {
                 ActivityLogId = id,
@@ -35,16 +38,21 @@ namespace todo_list_backend.Repositories
 
         public IEnumerable<ActivityLogItem> Select(Func<ActivityLogItem, bool> predicate, int skip, int take)
         {
-            var query =
+            var query = (
                 from logItem in _db.ActivityLog
                 join valuePair in _db.ActivityLogValues
                 on logItem.Id equals valuePair.ActivityLogId
-                select new { logItem, valuePair };
+                select new { logItem, valuePair }
+            ).ToList();
 
-            var result = query
-                .GroupBy(i => i.logItem).Select(i => new ActivityLogItem
+            var grouped = query
+                .GroupBy(i => i.logItem).ToList();
+
+            var result = grouped
+                .Select(i => new ActivityLogItem
                 {
                     Id = i.Key.Id,
+                    Category = i.Key.Category,
                     ProjectId = i.Key.ProjectId,
                     UserId = i.Key.UserId,
                     Values = i.ToDictionary(grouping => grouping.valuePair.Key, grouping => grouping.valuePair.Value)
