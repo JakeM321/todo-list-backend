@@ -27,7 +27,7 @@ namespace todo_list_backend.Services.Project
         public ProjectMemberDto[] ListMembers(int projectId)
         {
             return _projectMembershipRepository
-                .ListWithUsers(project => project.Id == projectId)
+                .ListWithUsers(membership => membership.ProjectId == projectId)
                 .Select(pair => new ProjectMemberDto
                 {
                     UserId = pair.Item2.Id,
