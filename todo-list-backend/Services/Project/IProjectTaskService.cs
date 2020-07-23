@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using todo_list_backend.Models.Project.Dto.Task;
+using todo_list_backend.Types;
 
 namespace todo_list_backend.Services.Project
 {
@@ -13,5 +14,6 @@ namespace todo_list_backend.Services.Project
         CreateProjectTaskResultDto CreateProjectTask(int projectId, CreateProjectTaskDto dto);
         void SetCompletion(int userId, int projectTaskId, bool favourite);
         bool VerifyTaskBelongsToProject(int projectId, int projectTaskId);
+        Option<ProjectTaskDto> Find(int projectTaskId);
     }
 }

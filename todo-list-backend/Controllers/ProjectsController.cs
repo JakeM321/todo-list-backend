@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using todo_list_backend.Models.Project.Dto.Membership;
 using todo_list_backend.Models.Project.Dto.Project;
 using todo_list_backend.Models.Project.Dto.Task;
+using todo_list_backend.Models.Reporting.Dto;
 using todo_list_backend.Models.User;
 using todo_list_backend.Services;
 using todo_list_backend.Services.Project;
+using todo_list_backend.Services.Reporting;
 using todo_list_backend.Utils;
 
 namespace todo_list_backend.Controllers
@@ -24,17 +26,20 @@ namespace todo_list_backend.Controllers
         private IProjectTaskService _projectTaskService;
         private IProjectMembershipService _projectMembershipService;
         private IUserService _userService;
+        private IReportingService _reportingService;
 
         public ProjectsController(
             IProjectService projectService,
             IProjectTaskService projectTaskService,
             IProjectMembershipService projectMembershipService,
-            IUserService userService)
+            IUserService userService,
+            IReportingService reportingService)
         {
             _projectService = projectService;
             _projectTaskService = projectTaskService;
             _projectMembershipService = projectMembershipService;
             _userService = userService;
+            _reportingService = reportingService;
         }
 
         [HttpPost]
@@ -96,11 +101,26 @@ namespace todo_list_backend.Controllers
         [Authorize(Policy = "HasProjectMembership")]
         public IActionResult CreateTask([FromQuery] int projectId, CreateProjectTaskDto dto)
         {
-            var result = _projectTaskService.CreateProjectTask(projectId, dto);
+            return withUser(Request, user =>
+            {
+                var result = _projectTaskService.CreateProjectTask(projectId, dto);
 
-            return result.ValidUser
-                ? new JsonResult(new { result.Id }) 
-                : ValidationProblem("Cannot assign a task on this project to a non-member");
+                if (result.ValidUser)
+                {
+                    var recipients = _projectMembershipService.ListMembers(projectId).Select(i => i.UserId).ToArray();
+
+                    _reportingService.Report(new TaskAddedReport
+                    {
+                        AddedByUserId = user.Id,
+                        ProjectId = projectId,
+                        ProjectTaskId = result.Id
+                    }, recipients);
+                }
+
+                return result.ValidUser
+                    ? new JsonResult(new { result.Id })
+                    : ValidationProblem("Cannot assign a task on this project to a non-member");
+            });
         }
 
         [HttpGet]

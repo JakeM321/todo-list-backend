@@ -5,12 +5,8 @@ using System.Threading.Tasks;
 
 namespace todo_list_backend.Models.Notification
 {
-    public class CreateUserNotificationDto
+    public class CreateUserNotificationDto : CreateNotificationDto
     {
         public int UserId { get; set; }
-        public string Subject { get; set; }
-        public string Message { get; set; }
-        public bool isLink { get; set; }
-        public string Link { get; set; }
     }
 }

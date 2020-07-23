@@ -6,6 +6,7 @@ using todo_list_backend.Models.Project.Dto.Task;
 using todo_list_backend.Models.Project.Record;
 using todo_list_backend.Models.User;
 using todo_list_backend.Repositories;
+using todo_list_backend.Types;
 
 namespace todo_list_backend.Services.Project
 {
@@ -82,6 +83,15 @@ namespace todo_list_backend.Services.Project
                     record => record.ProjectId == projectId,
                     () => false
                 );
+        }
+
+        public Option<ProjectTaskDto> Find(int projectTaskId)
+        {
+            var search = GetDtos(
+                _projectTaskRepository.List(task => task.Id == projectTaskId, 0, 1)
+            );
+
+            return search.Any() ? new Option<ProjectTaskDto>(search.First()) : new Option<ProjectTaskDto>();
         }
     }
 }

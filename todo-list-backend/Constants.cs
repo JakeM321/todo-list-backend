@@ -9,5 +9,10 @@ namespace todo_list_backend
     {
         public const int TOKEN_REFRESH_WINDOW_MINUTES = 30;
         public const int TOKEN_LIFESPAN_MINUTES = 120;
+
+        public static class ActivityLogCategories
+        {
+            public const string TASK_ADDED = "TASK_ADDED";
+        }
     }
 }

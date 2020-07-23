@@ -39,3 +39,17 @@ CREATE TABLE ProjectTasks (
 	Description TEXT,
 	Completed INT
 );
+
+CREATE TABLE ActivityLog (
+	Id INTEGER PRIMARY KEY AUTOINCREMENT,
+	Category TEXT,
+	ProjectId INTEGER,
+	UserId INTEGER
+);
+
+CREATE TABLE ActivityLogValues (
+	Id INTEGER PRIMARY KEY AUTOINCREMENT,
+	ActivityLogId INT,
+	Key TEXT,
+	Value TEXT
+);

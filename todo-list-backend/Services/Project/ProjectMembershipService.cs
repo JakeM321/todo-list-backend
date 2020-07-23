@@ -30,6 +30,7 @@ namespace todo_list_backend.Services.Project
                 .ListWithUsers(project => project.Id == projectId)
                 .Select(pair => new ProjectMemberDto
                 {
+                    UserId = pair.Item2.Id,
                     DisplayName = pair.Item2.DisplayName,
                     Email = pair.Item2.Email
                 })

@@ -24,6 +24,7 @@ using todo_list_backend.Repositories;
 using todo_list_backend.Services;
 using todo_list_backend.Services.Notifications;
 using todo_list_backend.Services.Project;
+using todo_list_backend.Services.Reporting;
 using todo_list_backend.SignalR;
 using todo_list_backend.Types;
 
@@ -62,6 +63,10 @@ namespace todo_list_backend
             services.AddTransient<IProjectService, ProjectService>();
             services.AddTransient<IProjectTaskService, ProjectTaskService>();
             services.AddTransient<IProjectMembershipService, ProjectMembershipService>();
+
+            services.AddTransient<IActivityLogRepository, ActivityLogRepository>();
+            services.AddTransient<IActivityLogService, ActivityLogService>();
+            services.AddTransient<IReportingService, ReportingService>();
 
             services.AddAuthentication("Basic").AddScheme<AppAuthenticationOptions, AppAuthenticationHandler>("Basic", null);
             
